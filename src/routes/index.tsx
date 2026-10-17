@@ -293,7 +293,7 @@ function MonthlyChart({ rows, dark }: { rows: Sale[]; dark: boolean }) {
     return {
       type: "bar",
       data: {
-        labels: keys.map((k) => { const [y, mo] = k.split("-"); return `${mo}/${y.slice(2)}`; }),
+        labels: keys.map((k) => { return `${k.slice(5)}/${k.slice(2, 4)}`; }),
         datasets: [
           { type: "bar", label: "Vendas", data: keys.map((k) => m.get(k)!.n), backgroundColor: keys.map((k) => (m.get(k)!.fut ? mute : fg)), yAxisID: "y", barPercentage: 0.6 },
           { type: "line", label: "Receita acumulada", data: keys.map((k) => (acc += m.get(k)!.rev)), borderColor: red, borderWidth: 2, pointRadius: 0, tension: 0.3, yAxisID: "y1" },
@@ -301,7 +301,7 @@ function MonthlyChart({ rows, dark }: { rows: Sale[]; dark: boolean }) {
       },
       options: {
         responsive: true, maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
-        plugins: { legend: { labels: { boxWidth: 10 } }, tooltip: { callbacks: { label: (c) => c.datasetIndex ? `Receita acumulada: ${usd(c.parsed.y ?? 0)}` : `Vendas: ${c.parsed.y}${m.get(keys[c.dataIndex])!.fut ? " (projeção)" : ""}` } } },
+        plugins: { legend: { labels: { boxWidth: 10 } }, tooltip: { callbacks: { label: (c) => c.datasetIndex ? `Receita acumulada: ${usd(c.parsed.y ?? 0)}` : `Vendas: ${c.parsed.y}${m.get(keys[c.dataIndex] ?? "")?.fut ? " (projeção)" : ""}` } } },
         scales: { x: { grid: { display: false } }, y: { beginAtZero: true, ticks: { precision: 0 } }, y1: { position: "right", grid: { display: false }, ticks: { callback: (v) => usdShort(Number(v)) } } },
       },
     } as import("chart.js").ChartConfiguration;
