@@ -72,26 +72,26 @@ function Index() {
   const cities = useMemo(() => {
     const g = new Map<string, Sale[]>();
     rows.forEach((r) => g.set(r.city, [...(g.get(r.city) ?? []), r]));
-    return [...g].map(([city, rs]) => ({ city, state: rs[0].state, n: rs.length, rev: rs.reduce((a, r) => a + r.price, 0), top: leaders(rs, (r) => r.model).names as string[] }))
+    return [...g].map(([city, rs]) => ({ city, state: rs[0]?.state ?? "", n: rs.length, rev: rs.reduce((a, r) => a + r.price, 0), top: leaders(rs, (r) => r.model).names as string[] }))
       .sort((a, b) => b.n - a.n || b.rev - a.rev);
   }, [rows]);
 
   const insights = useMemo(() => {
-    if (!rows.length) return [];
+    const c0 = cities[0]; if (!rows.length || !c0) return [];
     const out: string[] = [];
-    const topC = cities.filter((c) => c.n === cities[0].n);
+    const topC = cities.filter((c) => c.n === c0.n);
     out.push(topC.length > 3
-      ? `${topC.length} cidades empatam na liderança com ${cities[0].n} venda(s) cada — nenhuma se destaca isoladamente.`
-      : `Cidade de destaque: ${topC.map((c) => c.city).join(", ")} com ${cities[0].n} venda(s).`);
+      ? `${topC.length} cidades empatam na liderança com ${c0.n} venda(s) cada — nenhuma se destaca isoladamente.`
+      : `Cidade de destaque: ${topC.map((c) => c.city).join(", ")} com ${c0.n} venda(s).`);
     const tl = leaders(rows, (r) => r.line);
     out.push(`Linha mais popular: ${tl.names.join(", ")} (${tl.max} vendas, ${Math.round((tl.max / rows.length) * 100)}% do total). Modelo líder: ${topModel.names.join(", ")} (${topModel.max}).`);
     const tp = leaders(rows, (r) => r.pay);
     out.push(`Forma de pagamento preferida: ${tp.names.join(", ")} (${Math.round((tp.max / rows.length) * 100)}% das vendas).`);
-    const bt = [...cities].sort((a, b) => b.rev / b.n - a.rev / a.n)[0];
+    const bt = [...cities].sort((a, b) => b.rev / b.n - a.rev / a.n)[0] ?? c0;
     out.push(`Maior ticket médio por cidade: ${bt.city} (${usd(bt.rev / bt.n)}, ${bt.n} venda${bt.n > 1 ? "s" : ""}).`);
     const avg = rows.length / cities.length;
     out.push(`Pulverização ${avg < 1.6 ? "alta" : avg < 3 ? "moderada" : "baixa"}: ${rows.length} vendas em ${cities.length} cidades (média de ${avg.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} por cidade).`);
-    if (cities[0].n <= 3) out.push(`Atenção: a amostra por cidade é pequena (máx. ${cities[0].n} vendas); rankings de cidade não são estatisticamente conclusivos.`);
+    if (c0.n <= 3) out.push(`Atenção: a amostra por cidade é pequena (máx. ${c0.n} vendas); rankings de cidade não são estatisticamente conclusivos.`);
     if (futureCount) out.push(`${futureCount} venda(s) têm data posterior a ${new Date(TODAY).toLocaleDateString("pt-BR", { timeZone: "UTC" })} e são tratadas como projeção.`);
     return out;
   }, [rows, cities, topModel, futureCount]);
