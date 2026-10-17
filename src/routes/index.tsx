@@ -163,7 +163,7 @@ function Index() {
           <div className="mt-6 flex gap-6 text-xs">
             <span className="eyebrow self-center">Datas futuras</span>
             {[["flag", "Sinalizar como projeção"], ["exclude", "Excluir"]].map(([k, v]) => (
-              <button key={k} onClick={() => setF((p) => ({ ...p, future: k }))} className={`border-b pb-1 uppercase tracking-[0.15em] transition ${f.future === k ? "border-accent text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>{v}</button>
+              <button key={k} onClick={() => setF((p) => ({ ...p, future: k ?? "flag" }))} className={`border-b pb-1 uppercase tracking-[0.15em] transition ${f.future === k ? "border-accent text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>{v}</button>
             ))}
           </div>
         </section>
